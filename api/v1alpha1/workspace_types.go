@@ -4,6 +4,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const (
+	WorkspaceVisibilityLabel     = "toolchain.dev.openshift.com/workspace-visibility"
+	WorkspaceVisibilityCommunity = "community"
+)
+
 // WorkspaceStatus defines the observed state of a Workspace
 // +k8s:openapi-gen=true
 type WorkspaceStatus struct {
@@ -37,6 +42,12 @@ type WorkspaceStatus struct {
 	// +listType=atomic
 	// +optional
 	Bindings []Binding `json:"bindings,omitempty"`
+
+	// Visibility represents whether the workspace is visibile just to owner and directly assigned users
+	// or from the whole community
+	// +kubebuilder:validation:Enum=private,community
+	// +required
+	Visibility string `json:"Visibility"`
 }
 
 // Binding defines a user role in a given workspace,
