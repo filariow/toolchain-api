@@ -10,6 +10,14 @@ const (
 	WorkspaceVisibilityPrivate   = "private"
 )
 
+// WorkspaceSpec defines the spec of a Workspace
+// +k8s:openapi-gen=true
+type WorkspaceSpec struct {
+	// +kubebuilder:validation:Enum:=private;community
+	// +kubebuilder:default:=private
+	Visibility string `json:"visibility"`
+}
+
 // WorkspaceStatus defines the observed state of a Workspace
 // +k8s:openapi-gen=true
 type WorkspaceStatus struct {
@@ -87,6 +95,7 @@ type BindingRequest struct {
 }
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:spec
 // +kubebuilder:subresource:status
 // Workspace is the Schema for the workspaces API but it is only for use by the Proxy. There will be
 // no actual Workspace CRs in the host/member clusters. The CRD will be installed in member clusters
@@ -101,6 +110,7 @@ type Workspace struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	Spec   WorkspaceSpec   `json:"spec,omitempty"`
 	Status WorkspaceStatus `json:"status,omitempty"`
 }
 
