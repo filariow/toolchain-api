@@ -4,18 +4,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const (
-	WorkspaceVisibilityLabel     = "toolchain.dev.openshift.com/workspace-visibility"
-	WorkspaceVisibilityCommunity = "community"
-	WorkspaceVisibilityPrivate   = "private"
-)
-
 // WorkspaceSpec defines the spec of a Workspace
 // +k8s:openapi-gen=true
 type WorkspaceSpec struct {
 	// +kubebuilder:validation:Enum:=private;community
 	// +kubebuilder:default:=private
-	Visibility string `json:"visibility"`
+	Visibility SpaceVisibility `json:"visibility"`
 }
 
 // WorkspaceStatus defines the observed state of a Workspace
