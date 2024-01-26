@@ -37,21 +37,6 @@ const (
 	SpaceStateLabelValueClusterAssigned = "cluster-assigned"
 )
 
-type SpaceVisibility string
-
-const (
-	SpaceVisibilityPrivate   SpaceVisibility = "private"
-	SpaceVisibilityCommunity SpaceVisibility = "community"
-)
-
-// SpaceUserConfig defines the space configuration the owner can edit
-// +k8s:openapi-gen=true
-type SpaceUserConfig struct {
-	// +kubebuilder:validation:Enum:=private;community
-	// +kubebuilder:default:=private
-	Visibility SpaceVisibility `json:"visibility"`
-}
-
 // SpaceSpec defines the desired state of Space
 // +k8s:openapi-gen=true
 type SpaceSpec struct {
@@ -119,7 +104,6 @@ type SpaceStatus struct {
 }
 
 // +kubebuilder:object:root=true
-// +kubebuilder:subresource:config
 // +kubebuilder:subresource:status
 // Space is the Schema for the spaces API
 // +k8s:openapi-gen=true
@@ -134,9 +118,8 @@ type Space struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SpaceSpec       `json:"spec,omitempty"`
-	Config SpaceUserConfig `json:"config"`
-	Status SpaceStatus     `json:"status,omitempty"`
+	Spec   SpaceSpec   `json:"spec,omitempty"`
+	Status SpaceStatus `json:"status,omitempty"`
 }
 
 //+kubebuilder:object:root=true
