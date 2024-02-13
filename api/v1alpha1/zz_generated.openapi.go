@@ -78,6 +78,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/codeready-toolchain/api/api/v1alpha1.NotificationSpec":                      schema_codeready_toolchain_api_api_v1alpha1_NotificationSpec(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.NotificationStatus":                    schema_codeready_toolchain_api_api_v1alpha1_NotificationStatus(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.NotificationsConfig":                   schema_codeready_toolchain_api_api_v1alpha1_NotificationsConfig(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.PropagatedClaims":                      schema_codeready_toolchain_api_api_v1alpha1_PropagatedClaims(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.ProxyPlugin":                           schema_codeready_toolchain_api_api_v1alpha1_ProxyPlugin(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.ProxyPluginSpec":                       schema_codeready_toolchain_api_api_v1alpha1_ProxyPluginSpec(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.ProxyPluginStatus":                     schema_codeready_toolchain_api_api_v1alpha1_ProxyPluginStatus(ref),
@@ -105,6 +106,11 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceBindingSpec":                      schema_codeready_toolchain_api_api_v1alpha1_SpaceBindingSpec(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceBindingStatus":                    schema_codeready_toolchain_api_api_v1alpha1_SpaceBindingStatus(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceConfig":                           schema_codeready_toolchain_api_api_v1alpha1_SpaceConfig(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerCapacityThresholds":    schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerCapacityThresholds(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfig":                schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfig(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigList":            schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigList(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigSpec":            schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigSpec(ref),
+		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigStatus":          schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigStatus(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceRequest":                          schema_codeready_toolchain_api_api_v1alpha1_SpaceRequest(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceRequestConfig":                    schema_codeready_toolchain_api_api_v1alpha1_SpaceRequestConfig(ref),
 		"github.com/codeready-toolchain/api/api/v1alpha1.SpaceRequestSpec":                      schema_codeready_toolchain_api_api_v1alpha1_SpaceRequestSpec(ref),
@@ -1236,14 +1242,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_MasterUserRecordSpec(ref common
 				Description: "MasterUserRecordSpec defines the desired state of MasterUserRecord",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"userID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UserID is the user ID from RHD Identity Provider token (“sub” claim)",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"disabled": {
 						SchemaProps: spec.SchemaProps{
 							Description: "If set to true then the corresponding user should not be able to login (but the underlying UserAccounts still exists) \"false\" is assumed by default",
@@ -1273,13 +1271,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_MasterUserRecordSpec(ref common
 							},
 						},
 					},
-					"originalSub": {
-						SchemaProps: spec.SchemaProps{
-							Description: "OriginalSub is an optional property temporarily introduced for the purpose of migrating the users to a new IdP provider client, and contains the user's \"original-sub\" claim",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"tierName": {
 						SchemaProps: spec.SchemaProps{
 							Description: "TierName is an optional property introduced to retain the name of the tier for which the Dev Sandbox user is provisioned, so we can still deal with deactivation once the NSTemplateSet field has been removed from `[]spec.UserAccounts` temporarily marked as optional until the migration took place (CRT-1321)",
@@ -1295,7 +1286,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_MasterUserRecordSpec(ref common
 						},
 					},
 				},
-				Required: []string{"userID"},
 			},
 		},
 		Dependencies: []string{
@@ -2414,6 +2404,56 @@ func schema_codeready_toolchain_api_api_v1alpha1_NotificationsConfig(ref common.
 		},
 		Dependencies: []string{
 			"github.com/codeready-toolchain/api/api/v1alpha1.NotificationSecret"},
+	}
+}
+
+func schema_codeready_toolchain_api_api_v1alpha1_PropagatedClaims(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"sub": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Sub contains the value of the 'sub' claim",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"userID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "UserID contains the value of the 'user_id' claim",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"accountID": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AccountID contains the value of the 'account_id' claim",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"originalSub": {
+						SchemaProps: spec.SchemaProps{
+							Description: "OriginalSub is an optional property temporarily introduced for the purpose of migrating the users to a new IdP provider client, and contains the user's \"original-sub\" claim",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"email": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Email contains the user's email address",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"sub", "email"},
+			},
+		},
 	}
 }
 
@@ -3687,6 +3727,225 @@ func schema_codeready_toolchain_api_api_v1alpha1_SpaceConfig(ref common.Referenc
 	}
 }
 
+func schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerCapacityThresholds(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SpaceProvisionerCapacityThresholds defines the capacity thresholds of the space provisioner",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"maxNumberOfSpaces": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MaxNumberOfSpaces is the maximum number of spaces that can be provisioned to the referenced cluster.\n\n0 or undefined value means no limit.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"maxMemoryUtilizationPercent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "MaxMemoryUtilizationPercent is the maximum memory utilization of the cluster to permit provisioning new spaces to it.\n\n0 or undefined value means no limit.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SpaceProvisionerConfig is the configuration of space provisioning in the member clusters.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigStatus"),
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigSpec", "github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfigStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SpaceProvisionerConfigList contains a list of SpaceProvisionerConfig",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfig"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerConfig", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"placementRoles": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-type": "set",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "PlacementRoles is the list of roles, or flavors, that the provisioner possesses that influence the space scheduling decisions.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"toolchainCluster": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ToolchainCluster is the name of the ToolchainCluster CR of the member cluster that this config is for.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"enabled": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Enabled specifies whether the member cluster is enabled (and therefore can hold spaces) or not.",
+							Default:     false,
+							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"capacityThresholds": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CapacityThresholds specifies the max capacities allowed in this provisioner",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerCapacityThresholds"),
+						},
+					},
+				},
+				Required: []string{"toolchainCluster"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/codeready-toolchain/api/api/v1alpha1.SpaceProvisionerCapacityThresholds"},
+	}
+}
+
+func schema_codeready_toolchain_api_api_v1alpha1_SpaceProvisionerConfigStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"conditions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"type",
+								},
+								"x-kubernetes-list-type":       "map",
+								"x-kubernetes-patch-merge-key": "type",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Conditions describes the state of the configuration (its validity). The only known condition type is \"Ready\".",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/codeready-toolchain/api/api/v1alpha1.Condition"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/codeready-toolchain/api/api/v1alpha1.Condition"},
+	}
+}
+
 func schema_codeready_toolchain_api_api_v1alpha1_SpaceRequest(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4713,25 +4972,10 @@ func schema_codeready_toolchain_api_api_v1alpha1_UserAccountSpec(ref common.Refe
 				Description: "UserAccountSpec defines the desired state of UserAccount",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
-					"userID": {
-						SchemaProps: spec.SchemaProps{
-							Description: "UserID is the user ID from RHD Identity Provider token (“sub” claim) Is to be used to create Identity and UserIdentityMapping resources",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"disabled": {
 						SchemaProps: spec.SchemaProps{
 							Description: "If set to true then the corresponding user should not be able to login \"false\" is assumed by default",
 							Type:        []string{"boolean"},
-							Format:      "",
-						},
-					},
-					"originalSub": {
-						SchemaProps: spec.SchemaProps{
-							Description: "OriginalSub is an optional property temporarily introduced for the purpose of migrating the users to a new IdP provider client, and contains the user's \"original-sub\" claim",
-							Type:        []string{"string"},
 							Format:      "",
 						},
 					},
@@ -4743,7 +4987,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_UserAccountSpec(ref common.Refe
 						},
 					},
 				},
-				Required: []string{"userID"},
 			},
 		},
 		Dependencies: []string{
@@ -4851,43 +5094,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_UserSignupSpec(ref common.Refer
 							Format:      "",
 						},
 					},
-					"userid": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The user's user ID, obtained from the identity provider from the 'sub' (subject) claim",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"username": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The user's username, obtained from the identity provider.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"givenName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The user's first name, obtained from the identity provider.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"familyName": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The user's last name, obtained from the identity provider.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"company": {
-						SchemaProps: spec.SchemaProps{
-							Description: "The user's company name, obtained from the identity provider.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"states": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
@@ -4908,13 +5114,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_UserSignupSpec(ref common.Refer
 							},
 						},
 					},
-					"originalSub": {
-						SchemaProps: spec.SchemaProps{
-							Description: "OriginalSub is an optional property temporarily introduced for the purpose of migrating the users to a new IdP provider client, and contains the user's \"original-sub\" claim",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
 					"identityClaims": {
 						SchemaProps: spec.SchemaProps{
 							Description: "IdentityClaims contains as-is claim values extracted from the user's access token",
@@ -4923,7 +5122,6 @@ func schema_codeready_toolchain_api_api_v1alpha1_UserSignupSpec(ref common.Refer
 						},
 					},
 				},
-				Required: []string{"userid", "username"},
 			},
 		},
 		Dependencies: []string{
