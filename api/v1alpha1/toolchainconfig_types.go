@@ -32,6 +32,20 @@ type ToolchainConfigSpec struct {
 	// Contains all member operator configurations for all member clusters
 	// +optional
 	Members Members `json:"members,omitempty"`
+
+	// Contains all configuration needed for the enabling PublicViewer support
+	// +optional
+	PublicViewer *PublicViewerConfig `json:"publicViewer,omitempty"`
+}
+
+// PublicViewer used to enable public-viewer support
+// +k8s:openapi-gen=true
+type PublicViewerConfig struct {
+	// +optional
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=63
+	// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
+	Username string `json:"username,omitempty"`
 }
 
 // HostConfig contains all configuration parameters of the host operator
