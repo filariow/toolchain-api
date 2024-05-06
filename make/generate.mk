@@ -61,10 +61,7 @@ generate-openapi: openapi-gen
 	@## and function names would be different)
 	GOPATH=$(FAKE_GOPATH) \
 	&& cd $(CRT_IN_GOPATH)/api \
-	&& $(OPENAPI_GEN) --input-dirs ./api/$(API_VERSION)/ \
-	--output-package github.com/codeready-toolchain/api/api/$(API_VERSION) \
-	--output-file-base zz_generated.openapi \
-	--go-header-file=make/go-header.txt
+	&& $(MAKE) generate-openapi-source
 	@## clean up the mess
 	rm -Rf $(FAKE_GOPATH)
 
