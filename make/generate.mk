@@ -33,6 +33,19 @@ generate-deepcopy-and-crds: remove-config controller-gen
 	$(Q)$(CONTROLLER_GEN) crd \
 	object paths="./..." output:crd:artifacts:config=$(PATH_TO_CRD_BASES)
 	
+.PHONY: docker-generate-openapi
+docker-generate-openapi: generate-deepcopy-and-crds openapi-gen
+	docker run --rm \
+		-v "$(shell realpath ..):/go/src/github.com/codeready-toolchain/:cached" \
+		-v "$(shell $(GO) env GOMODCACHE):/go/pkg/mod:cached" \
+		-v "$(shell $(GO) env GOCACHE):/go/.cache/go-build:cached" \
+		-e "GOCACHE=/go/.cache/go-build" \
+		-e "GO=go" \
+		-w "/go/src/github.com/codeready-toolchain/api" \
+		-u "$(shell id -u):$(shell id -g)" \
+		"golang:1.20.8" \
+		sh -c "make --file make/generate.mk generate-openapi"
+
 .PHONY: generate-openapi
 generate-openapi: openapi-gen
 	@echo "re-generating the openapi go file..."
