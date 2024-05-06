@@ -34,7 +34,7 @@ generate-deepcopy-and-crds: remove-config controller-gen
 	object paths="./..." output:crd:artifacts:config=$(PATH_TO_CRD_BASES)
 	
 .PHONY: docker-generate-openapi
-docker-generate-openapi: generate-deepcopy-and-crds openapi-gen
+docker-generate-openapi:
 	docker run --rm \
 		-v "$(shell realpath ..):/go/src/github.com/codeready-toolchain/:cached" \
 		-v "$(shell $(GO) env GOMODCACHE):/go/pkg/mod:cached" \
@@ -44,7 +44,7 @@ docker-generate-openapi: generate-deepcopy-and-crds openapi-gen
 		-w "/go/src/github.com/codeready-toolchain/api" \
 		-u "$(shell id -u):$(shell id -g)" \
 		"golang:1.20.8" \
-		sh -c "make --file make/generate.mk generate-openapi"
+		sh -c "make --file make/generate.mk generate-openapi-source"
 
 .PHONY: generate-openapi
 generate-openapi: openapi-gen
@@ -67,6 +67,12 @@ generate-openapi: openapi-gen
 	--go-header-file=make/go-header.txt
 	@## clean up the mess
 	rm -Rf $(FAKE_GOPATH)
+
+generate-openapi-source: openapi-gen
+	$(OPENAPI_GEN) --input-dirs ./api/$(API_VERSION)/ \
+	--output-package github.com/codeready-toolchain/api/api/$(API_VERSION) \
+	--output-file-base zz_generated.openapi \
+	--go-header-file=make/go-header.txt
 
 # make sure that that the `host-operator` and `member-operator` repositories exist locally 
 # and that they don't have any pending changes (except for the CRD files). 
